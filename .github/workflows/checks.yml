@@ -5,25 +5,11 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    if: contains(github.event.comment.html_url, '/pull/')
+    runs-on: [ubuntu-latest]
     steps:
-      - name: Check for test command
-        id: check_command
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const command = '/test';
-            const comment = context.payload.comment.body;
-            if (comment.includes(command)) {
-              console.log('::set-output name=run_checks::true');
-            } else {
-              console.log('::set-output name=run_checks::false');
-            }
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run Checks
-        if: steps.check_command.outputs.run_checks == 'true'
+        if: contains(github.event.comment.body, '/test') 
         run: |
           # Trigger all checks on the PR
           curl -X POST \
